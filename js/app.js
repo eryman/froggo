@@ -109,6 +109,7 @@ Player.prototype.handleInput = function(keys) {
 Player.prototype.scoreKeeper = function(point){
     this.score += point;
     item.update();
+    extraLife.update();
     return this.score;
 }
 
@@ -181,21 +182,32 @@ Player.prototype.charSelect = function(i){
  
 
 //Item "class"
-var Item = function(){
+var Item = function(f){
     this.x = -100;
     this.y = -100;
     this.spriteArray = ['images/Gem Blue.png', 'images/Gem Green.png', 'images/Gem Orange.png'];
     this.sprite = null;
+    this.frequency = f;
 }
 
 //updates location of item (item shows up whenever score is a multiple of 6)
 Item.prototype.update = function(){
-    if (player.score > 1 && player.score % 6 == 0){
-        this.sprite = Resources.get(this.spriteArray[Math.floor(Math.random()*3)])
+    if (player.score > 1 && player.score % this.frequency == 0){
+    	console.log(this.spriteArray);
+    	//console.log("item appeared!")
+    	//ADD CODE HERE TO MAKE IT WORK WITH THE STAR -- MAYBE AN IF STATEMENT STATING THAT IF THE 
+    	//SPRITEARRAY IS LARGER THAN 1, DO THE FOLLOWING, BUT IF IT ISNT, DO A DIFFERENT THING
+        if (this.spriteArray.length > 1){
+        	console.log('bears');
+        	this.sprite = Resources.get(this.spriteArray[Math.floor(Math.random()*3)])
+        }
+        else {
+        	this.sprite = Resources.get(this.spriteArray[0]);
+        }
         this.x = (Math.floor(Math.random()*5)) * xBlock;
         this.y = (Math.floor(Math.random()*3)+1) * yBlock - 20;
     }
-    if (player.score > 1 && player.score % 6 == 1){
+    if (player.score > 1 && player.score % this.frequency == 1){
         this.x = -100;
         this.y = -100;
     }
@@ -203,7 +215,8 @@ Item.prototype.update = function(){
 
 //displays item - one item will appear for every six points scored
 Item.prototype.render = function(){
-    if (player.score > 1 && player.score % 6 == 0){
+    if (player.score > 1 && player.score % this.frequency == 0){
+    	//console.log(this.sprite);
         ctx.drawImage(this.sprite, this.x, this.y);
     }
 }
@@ -214,7 +227,10 @@ Item.prototype.render = function(){
 var player = new Player();
 var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
 //instantiates item object
-var item = new Item();
+var item = new Item(6);
+var extraLife = new Item(2);
+extraLife.spriteArray = ['images/Star.png'];
+console.log(extraLife.spriteArray[0]);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

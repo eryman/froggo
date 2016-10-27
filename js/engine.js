@@ -178,6 +178,7 @@ var Engine = (function(global) {
             enemy.render();
         });
         item.render();
+        extraLife.render();
         player.render();
         player.renderScore();
         player.renderLives();
@@ -322,7 +323,8 @@ var Engine = (function(global) {
         'images/Selector.png',
         'images/Gem Blue.png',
         'images/Gem Green.png',
-        'images/Gem Orange.png'
+        'images/Gem Orange.png',
+        'images/Star.png'
     ]);
     //changed the line below so that it calls 'loadCharSelect' rather than 'init' -- 'loadCharSelect' calls 'init' when 'enter' is pressed
     Resources.onReady(loadCharSelect);
