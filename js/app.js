@@ -54,7 +54,7 @@ var Player = function() {
     this.x = xBlock * 2;
     this.y = yBlock * 4 + 43;
     this.score = 0;
-    this.lives = 4;
+    this.lives = 10000;
 }
 
 //resets the player's location and raises score by 1 if water is reached
@@ -207,10 +207,6 @@ Item.prototype.update = function(){
         this.x = (Math.floor(Math.random()*5)) * xBlock;
         this.y = (Math.floor(Math.random()*3)+1) * yBlock - 20;
     }
-    if (player.score > 1 && player.score % this.frequency == 1){
-        this.x = -100;
-        this.y = -100;
-    }
 }
 
 //displays item - one item will appear for every six points scored
@@ -219,6 +215,11 @@ Item.prototype.render = function(){
     	//console.log(this.sprite);
         ctx.drawImage(this.sprite, this.x, this.y);
     }
+}
+
+Item.prototype.reset = function(){
+	this.x = -100;
+	this.y = -100;
 }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -230,7 +231,6 @@ var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
 var item = new Item(6);
 var extraLife = new Item(2);
 extraLife.spriteArray = ['images/Star.png'];
-console.log(extraLife.spriteArray[0]);
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -260,6 +260,12 @@ function checkCollisions() {
     //if player collides with an item, gain one point
     if (player.x - item.x <= 67 && player.x - item.x >= -66 && player.y - item.y <= 48 && player.y - item.y >= -87){
         player.scoreKeeper(1);
+        item.reset();
+    }
+    //if player collides with an extraLife, gain one life
+    if (player.x - extraLife.x <= 50 && player.x - extraLife.x >= -51 && player.y - extraLife.y <= 59 && player.y - extraLife.y >= -61){
+        player.updateLives(1);
+        extraLife.reset();
     }
 }
 

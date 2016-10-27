@@ -40,6 +40,7 @@ var Engine = (function(global) {
 
 
 
+
 	
 
     /* This function serves as the kickoff point for the game loop itself
@@ -199,8 +200,8 @@ var Engine = (function(global) {
 	    	enemy.reset(i);
 	    	i++;
 	    })
-
-        player.updateLives(-1);
+        player.lives = 3;
+        //player.updateLives(-1);
 	}
 
     //creates a game over screen once player.lives reaches 0
@@ -238,7 +239,7 @@ var Engine = (function(global) {
     var i = 0;  
 
 	function startGameInput(keys) {
-        if (player.lives > 3){    
+        if (player.lives > 9999){    
             switch(keys){
       	        case 'enter':
                     player.charSelect(i);
@@ -268,14 +269,16 @@ var Engine = (function(global) {
 
     //resets all objects after game over and reloads character select screen when 'space' is pressed 
 	function gameOverInput(keys) {
-	    switch(keys){
-	        case 'space':
-                reset();
-                player.lives = 4;
-                i = 0;
-                loadCharSelect();
-	            break;
-	    }
+        if (player.lives === 0) {
+    	    switch(keys){
+    	        case 'space':
+                    reset();
+                    player.lives = 10000;
+                    i = 0;
+                    loadCharSelect();
+    	            break;
+	        };
+        }
 	}
 
     //loads the character select screen
