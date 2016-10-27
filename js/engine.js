@@ -86,6 +86,8 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
+        backgroundMusic.src = 'audio/octoberwalrus-cosmicdanceparty.mp3'
+        backgroundMusic.play();
         main();
     }
 
@@ -207,6 +209,8 @@ var Engine = (function(global) {
     //creates a game over screen once player.lives reaches 0
     function gameOver(){
 	    if (player.lives == 0){
+            backgroundMusic.src = "";
+            heroDeath.play();
 	    	ctx.save()
 	    	ctx.font = "70pt impact";
 			ctx.textAlign = "center";
@@ -247,6 +251,7 @@ var Engine = (function(global) {
     	            break;
                 case 'left':
                     if (i > 0) {
+                        menuNavigate.play();
                         i--;                    
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         renderBackground();
@@ -256,6 +261,7 @@ var Engine = (function(global) {
     	            break;
     	        case 'right':
                     if (i < 4) {
+                        menuNavigate.play();
                         i++;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         renderBackground();

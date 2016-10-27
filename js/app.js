@@ -60,6 +60,7 @@ var Player = function() {
 //resets the player's location and raises score by 1 if water is reached
 Player.prototype.update = function() {
     if (this.y < 20){
+    	achievement.play();
         this.reset();
         this.scoreKeeper(1);
     }
@@ -193,12 +194,7 @@ var Item = function(f){
 //updates location of item (item shows up whenever score is a multiple of 6)
 Item.prototype.update = function(){
     if (player.score > 1 && player.score % this.frequency == 0){
-    	console.log(this.spriteArray);
-    	//console.log("item appeared!")
-    	//ADD CODE HERE TO MAKE IT WORK WITH THE STAR -- MAYBE AN IF STATEMENT STATING THAT IF THE 
-    	//SPRITEARRAY IS LARGER THAN 1, DO THE FOLLOWING, BUT IF IT ISNT, DO A DIFFERENT THING
         if (this.spriteArray.length > 1){
-        	console.log('bears');
         	this.sprite = Resources.get(this.spriteArray[Math.floor(Math.random()*3)])
         }
         else {
@@ -217,6 +213,7 @@ Item.prototype.render = function(){
     }
 }
 
+
 Item.prototype.reset = function(){
 	this.x = -100;
 	this.y = -100;
@@ -225,11 +222,20 @@ Item.prototype.reset = function(){
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
+var pickup = new Audio('audio/pickup.wav');
+var achievement = new Audio('audio/achievement.wav');
+var hit = new Audio('audio/hit.wav');
+var menuNavigate = new Audio('audio/menu-navigate.wav');
+var heroDeath = new Audio('audio/hero-death.wav');
+var backgroundMusic = new Audio('audio/octoberwalrus-cosmicdanceparty.mp3');
+backgroundMusic.volume = 0.3;
+
+
 var player = new Player();
 var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
 //instantiates item object
 var item = new Item(6);
-var extraLife = new Item(2);
+var extraLife = new Item(10);
 extraLife.spriteArray = ['images/Star.png'];
 
 // This listens for key presses and sends the keys to your
@@ -253,6 +259,7 @@ function checkCollisions() {
 	//if player collides with enemy, lose one life and restart from origin point
     allEnemies.forEach(function(enemy){
         if (player.x - enemy.x >= -47 && player.x - enemy.x <= 63 && player.y - enemy.y >= -64 && player.y - enemy.y <= 51){
+        	hit.play();
             player.reset();
             player.updateLives(-1);
         }
@@ -260,11 +267,13 @@ function checkCollisions() {
     //if player collides with an item, gain one point
     if (player.x - item.x <= 67 && player.x - item.x >= -66 && player.y - item.y <= 48 && player.y - item.y >= -87){
         player.scoreKeeper(1);
+        pickup.play();
         item.reset();
     }
     //if player collides with an extraLife, gain one life
     if (player.x - extraLife.x <= 50 && player.x - extraLife.x >= -51 && player.y - extraLife.y <= 59 && player.y - extraLife.y >= -61){
         player.updateLives(1);
+        pickup.play();
         extraLife.reset();
     }
 }
