@@ -165,7 +165,7 @@ Player.prototype.resetLives = function(){
 }
 
 
-//creates character select menu over start screen
+//creates character select menu over start screen -- xLocation refers to the block where the Selector is - changes by using startGameInput in engine.js
 Player.prototype.renderCharSelect = function(xLocation){
     ctx.drawImage(Resources.get(this.selector), xBlock * xLocation, yBlock * 4 + 43);
     i = 0;
@@ -218,19 +218,22 @@ Item.prototype.reset = function(){
 	this.x = -100;
 	this.y = -100;
 }
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
 
+//Instantiate music and sound objects
+//All sound effects are from the LittleRobotSoundFactory library found on freesound.org
 var pickup = new Audio('audio/pickup.wav');
 var achievement = new Audio('audio/achievement.wav');
 var hit = new Audio('audio/hit.wav');
 var menuNavigate = new Audio('audio/menu-navigate.wav');
 var heroDeath = new Audio('audio/hero-death.wav');
+//Background Music is "Cosmic Dance Party," from the album Windmill Spiritual by octoberwalrus - http://octoberwalrus.bandcamp.com
 var backgroundMusic = new Audio('audio/octoberwalrus-cosmicdanceparty.mp3');
 backgroundMusic.volume = 0.3;
 
 
+// Now instantiate your objects.
+// Place all enemy objects in an array called allEnemies
+// Place the player object in a variable called player
 var player = new Player();
 var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
 //instantiates item object
@@ -255,7 +258,7 @@ document.addEventListener('keyup', function(e) {
 
 
 //checks for collisions between player and enemies/items
-function checkCollisions() {
+Player.prototype.checkCollisions = function() {
 	//if player collides with enemy, lose one life and restart from origin point
     allEnemies.forEach(function(enemy){
         if (player.x - enemy.x >= -47 && player.x - enemy.x <= 63 && player.y - enemy.y >= -64 && player.y - enemy.y <= 51){
@@ -265,13 +268,13 @@ function checkCollisions() {
         }
     })
     //if player collides with an item, gain one point
-    if (player.x - item.x <= 67 && player.x - item.x >= -66 && player.y - item.y <= 48 && player.y - item.y >= -87){
+    if (this.x - item.x <= 67 && this.x - item.x >= -66 && this.y - item.y <= 48 && this.y - item.y >= -87){
         player.scoreKeeper(1);
         pickup.play();
         item.reset();
     }
     //if player collides with an extraLife, gain one life
-    if (player.x - extraLife.x <= 50 && player.x - extraLife.x >= -51 && player.y - extraLife.y <= 59 && player.y - extraLife.y >= -61){
+    if (this.x - extraLife.x <= 50 && this.x - extraLife.x >= -51 && this.y - extraLife.y <= 59 && this.y - extraLife.y >= -61){
         player.updateLives(1);
         pickup.play();
         extraLife.reset();

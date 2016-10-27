@@ -30,10 +30,10 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    //the following lines control text style
     ctx.font = "24pt impact";
 	ctx.textAlign = "left"
-
-	ctx.fillStyle = "yellow";
+    ctx.fillStyle = "yellow";
 	ctx.strokeStyle = "black";
 	ctx.lineWidth = 2;
 	ctx.save();
@@ -86,6 +86,7 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
+        //added the following two lines to play background music when the game begins
         backgroundMusic.src = 'audio/octoberwalrus-cosmicdanceparty.mp3'
         backgroundMusic.play();
         main();
@@ -102,7 +103,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        checkCollisions();
+        player.checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -177,6 +178,7 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
+        //added calls to extra functions to keep track of score and items
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
@@ -203,12 +205,11 @@ var Engine = (function(global) {
 	    	i++;
 	    })
         player.lives = 3;
-        //player.updateLives(-1);
 	}
 
     //creates a game over screen once player.lives reaches 0
     function gameOver(){
-	    if (player.lives == 0){
+	    if (player.lives === 0){
             backgroundMusic.src = "";
             heroDeath.play();
 	    	ctx.save()
