@@ -86,7 +86,8 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
-        //added the following two lines to play background music when the game begins
+        //added the following three lines to play a sound effect and background music when the game begins
+        hit.play();
         backgroundMusic.src = 'audio/octoberwalrus-cosmicdanceparty.mp3'
         backgroundMusic.play();
         main();
@@ -207,24 +208,6 @@ var Engine = (function(global) {
         player.lives = 3;
 	}
 
-    //creates a game over screen once player.lives reaches 0
-    function gameOver(){
-	    if (player.lives === 0){
-            backgroundMusic.src = "";
-            heroDeath.play();
-	    	ctx.save()
-	    	ctx.font = "70pt impact";
-			ctx.textAlign = "center";
-	        ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2 + 50);
-	        ctx.strokeText("GAME OVER", canvas.width/2, canvas.height/2 + 50); 
-	        ctx.font = "20pt impact";
-	        ctx.fillText("Press Spacebar to play again!", canvas.width/2, canvas.height/2 + 80);
-	        ctx.strokeText("Press Spacebar to play again!", canvas.width/2, canvas.height/2 + 80); 
-	        ctx.restore();
-	        gameOverInput();
-
-	    }
-	}
 
     //prepares event listeners for character select and game over screens
 	document.addEventListener('keyup', function(e) {
@@ -243,6 +226,34 @@ var Engine = (function(global) {
     //variable used as parameter for player.renderCharSelect() -- changes with key strokes in startGameInput function
     var i = 0;  
 
+        //loads the character select screen
+    function loadCharSelect(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        renderBackground();
+        player.renderCharSelect(0);
+        renderStartText();
+    }
+
+    //displays text for start screen
+    function renderStartText(){
+        ctx.save()
+        ctx.font = "80pt impact";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 3;
+        ctx.fillText("FROGGO!", canvas.width/2, canvas.height/2 - 50);
+        ctx.strokeText("FROGGO!", canvas.width/2, canvas.height/2 - 50); 
+        ctx.font = "20pt impact";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 2;
+        ctx.fillText("A misleadingly titled game!", canvas.width/2, canvas.height/2-15);
+        ctx.strokeText("A misleadingly titled game!", canvas.width/2, canvas.height/2-15);
+        ctx.fillText("Use arrow keys to select player", canvas.width/2, canvas.height/2 + 40);
+        ctx.strokeText("Use arrow keys to select player", canvas.width/2, canvas.height/2 + 40);
+        ctx.fillText("and press Enter to play!", canvas.width/2, canvas.height/2 + 70);
+        ctx.strokeText("and press Enter to play!", canvas.width/2, canvas.height/2 + 70);    
+        ctx.restore();
+    }
+    
 	function startGameInput(keys) {
         if (player.lives > 9999){    
             switch(keys){
@@ -274,11 +285,30 @@ var Engine = (function(global) {
         }
 	}
 
+    //creates a game over screen once player.lives reaches 0
+    function gameOver(){
+        if (player.lives === 0){
+            backgroundMusic.src = "";
+            heroDeath.play();
+            ctx.save()
+            ctx.font = "70pt impact";
+            ctx.textAlign = "center";
+            ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2 + 50);
+            ctx.strokeText("GAME OVER", canvas.width/2, canvas.height/2 + 50); 
+            ctx.font = "20pt impact";
+            ctx.fillText("Press Spacebar to play again!", canvas.width/2, canvas.height/2 + 80);
+            ctx.strokeText("Press Spacebar to play again!", canvas.width/2, canvas.height/2 + 80); 
+            ctx.restore();
+            gameOverInput();
+
+        }
+    }
     //resets all objects after game over and reloads character select screen when 'space' is pressed 
 	function gameOverInput(keys) {
         if (player.lives === 0) {
     	    switch(keys){
     	        case 'space':
+                    hit.play();
                     reset();
                     player.lives = 10000;
                     i = 0;
@@ -288,33 +318,7 @@ var Engine = (function(global) {
         }
 	}
 
-    //loads the character select screen
-    function loadCharSelect(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        renderBackground();
-        player.renderCharSelect(0);
-        renderStartText();
-    }
 
-    //displays text for start screen
-    function renderStartText(){
-        ctx.save()
-        ctx.font = "80pt impact";
-        ctx.textAlign = "center";
-        ctx.lineWidth = 3;
-        ctx.fillText("FROGGO!", canvas.width/2, canvas.height/2 - 50);
-        ctx.strokeText("FROGGO!", canvas.width/2, canvas.height/2 - 50); 
-        ctx.font = "20pt impact";
-        ctx.textAlign = "center";
-        ctx.lineWidth = 2;
-        ctx.fillText("A totally original game!", canvas.width/2, canvas.height/2-15);
-        ctx.strokeText("A totally original game!", canvas.width/2, canvas.height/2-15);
-        ctx.fillText("Use arrow keys to select player", canvas.width/2, canvas.height/2 + 40);
-        ctx.strokeText("Use arrow keys to select player", canvas.width/2, canvas.height/2 + 40);
-        ctx.fillText("and press Enter to play!", canvas.width/2, canvas.height/2 + 70);
-        ctx.strokeText("and press Enter to play!", canvas.width/2, canvas.height/2 + 70);    
-        ctx.restore();
-    }
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when

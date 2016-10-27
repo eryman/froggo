@@ -4,7 +4,8 @@ var yBlock = 83;
 
 
 
-// Create Enemy "class"
+//------Create Enemy "class"------
+
 var Enemy = function(start) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -47,7 +48,8 @@ Enemy.prototype.render = function() {
 
 
 
-//Create Player "class"
+//------Create Player "class"------
+
 var Player = function() {
     this.spriteArray = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png']
     this.selector = 'images/Selector.png';
@@ -180,9 +182,35 @@ Player.prototype.charSelect = function(i){
 	this.sprite = this.spriteArray[i];
 }
 
+//checks for collisions between player and enemies/items
+Player.prototype.checkCollisions = function() {
+	//if player collides with enemy, lose one life and restart from origin point
+    allEnemies.forEach(function(enemy){
+        if (player.x - enemy.x >= -47 && player.x - enemy.x <= 63 && player.y - enemy.y >= -64 && player.y - enemy.y <= 51){
+        	hit.play();
+            player.reset();
+            player.updateLives(-1);
+        }
+    })
+    //if player collides with an item, gain one point
+    if (this.x - item.x <= 67 && this.x - item.x >= -66 && this.y - item.y <= 48 && this.y - item.y >= -87){
+        player.scoreKeeper(1);
+        pickup.play();
+        item.reset();
+    }
+    //if player collides with an extraLife, gain one life
+    if (this.x - extraLife.x <= 50 && this.x - extraLife.x >= -51 && this.y - extraLife.y <= 59 && this.y - extraLife.y >= -61){
+        player.updateLives(1);
+        pickup.play();
+        extraLife.reset();
+    }
+}
+
+
  
 
-//Item "class"
+//-----Item "class"-----
+
 var Item = function(f){
     this.x = -100;
     this.y = -100;
@@ -213,13 +241,15 @@ Item.prototype.render = function(){
     }
 }
 
-
 Item.prototype.reset = function(){
 	this.x = -100;
 	this.y = -100;
 }
 
-//Instantiate music and sound objects
+
+
+//------Instantiate music and sound objects------
+
 //All sound effects are from the LittleRobotSoundFactory library found on freesound.org
 var pickup = new Audio('audio/pickup.wav');
 var achievement = new Audio('audio/achievement.wav');
@@ -231,7 +261,9 @@ var backgroundMusic = new Audio('audio/octoberwalrus-cosmicdanceparty.mp3');
 backgroundMusic.volume = 0.3;
 
 
-// Now instantiate your objects.
+
+//------Instantiate player, enemy, and item objects------
+
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var player = new Player();
@@ -257,29 +289,6 @@ document.addEventListener('keyup', function(e) {
 });
 
 
-//checks for collisions between player and enemies/items
-Player.prototype.checkCollisions = function() {
-	//if player collides with enemy, lose one life and restart from origin point
-    allEnemies.forEach(function(enemy){
-        if (player.x - enemy.x >= -47 && player.x - enemy.x <= 63 && player.y - enemy.y >= -64 && player.y - enemy.y <= 51){
-        	hit.play();
-            player.reset();
-            player.updateLives(-1);
-        }
-    })
-    //if player collides with an item, gain one point
-    if (this.x - item.x <= 67 && this.x - item.x >= -66 && this.y - item.y <= 48 && this.y - item.y >= -87){
-        player.scoreKeeper(1);
-        pickup.play();
-        item.reset();
-    }
-    //if player collides with an extraLife, gain one life
-    if (this.x - extraLife.x <= 50 && this.x - extraLife.x >= -51 && this.y - extraLife.y <= 59 && this.y - extraLife.y >= -61){
-        player.updateLives(1);
-        pickup.play();
-        extraLife.reset();
-    }
-}
 
 
 
