@@ -1,6 +1,6 @@
 //X and Y dimensions of each block - for use in determining origin coordinates
-var xBlock = 101;
-var yBlock = 83;
+var X_BLOCK = 101;
+var Y_BLOCK = 83;
 
 
 
@@ -10,11 +10,12 @@ var Enemy = function(start) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
     this.speed = Math.random()*100+150;
-    this.y = start * yBlock - 20;
+    this.y = start * Y_BLOCK - 20;
     this.x = 0;
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+    this.isGone = false;
 };
 
 
@@ -26,16 +27,14 @@ Enemy.prototype.update = function(dt) {
     // all computers.
     this.x += this.speed*dt;
     if (this.x > 503/* && this.x < 506*/) {
-        allEnemies.push(new Enemy(Math.floor(Math.random()*3)+1));
-        var index = allEnemies.indexOf(this);
-        allEnemies.splice(index, 1);
-        //allEnemies.push(new Enemy(1));
-    }
+    	this.isGone = true;
+    	console.log(this.isGone);
+    };
 };
 
 //resets starting coordinates of enemies
 Enemy.prototype.reset = function(start){
-        this.y = start * yBlock - 20;
+        this.y = start * Y_BLOCK - 20;
         this.x = 0;
 }
 
@@ -53,8 +52,8 @@ Enemy.prototype.render = function() {
 var Player = function() {
     this.spriteArray = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png']
     this.selector = 'images/Selector.png';
-    this.x = xBlock * 2;
-    this.y = yBlock * 4 + 43;
+    this.x = X_BLOCK * 2;
+    this.y = Y_BLOCK * 4 + 43;
     this.score = 0;
     this.lives = 10000;
 }
@@ -70,8 +69,8 @@ Player.prototype.update = function() {
 
 //resets player location - used in .update() and checkCollisions()
 Player.prototype.reset = function() {
-    this.x = xBlock * 2;
-    this.y = yBlock * 4 + 43;
+    this.x = X_BLOCK * 2;
+    this.y = Y_BLOCK * 4 + 43;
     return this.x, this.y;
 }
 
@@ -85,23 +84,23 @@ Player.prototype.handleInput = function(keys) {
     if (this.lives > 0){
         switch(keys){
             case 'left':
-                if (this.x >= xBlock){
-                    this.x -= xBlock;
+                if (this.x >= X_BLOCK){
+                    this.x -= X_BLOCK;
                 };
                 break;
             case 'right':
-                if (this.x <= xBlock*3){
-                    this.x += xBlock;
+                if (this.x <= X_BLOCK*3){
+                    this.x += X_BLOCK;
                 };
                 break;
             case 'up':
                 if (this.y >= 0){
-                    this.y -= yBlock;
+                    this.y -= Y_BLOCK;
                 };
                 break;
             case 'down':
-                if (this.y <= yBlock*4){
-                    this.y += yBlock;
+                if (this.y <= Y_BLOCK*4){
+                    this.y += Y_BLOCK;
                 };
                 break;
         }
@@ -120,13 +119,13 @@ Player.prototype.scoreKeeper = function(point){
 Player.prototype.updateScore = function(){
     this.scoreText = null;
     if (this.score < 10){
-        this.scoreText = "Score: 00" + player.score;
+        this.scoreText = "Score: 00" + this.score;
     };
     if (this.score >= 10 && player.score < 100){
-        this.scoreText = "Score: 0" + player.score;
+        this.scoreText = "Score: 0" + this.score;
     };
     if (this.score >= 100 && player.score < 1000){
-        this.scoreText = "Score: " + player.score;
+        this.scoreText = "Score: " + this.score;
     };
     if (this.score >= 1000){
         this.scoreText = "Stop it. This game isn't that good. Go read a book or something.";
@@ -169,10 +168,10 @@ Player.prototype.resetLives = function(){
 
 //creates character select menu over start screen -- xLocation refers to the block where the Selector is - changes by using startGameInput in engine.js
 Player.prototype.renderCharSelect = function(xLocation){
-    ctx.drawImage(Resources.get(this.selector), xBlock * xLocation, yBlock * 4 + 43);
+    ctx.drawImage(Resources.get(this.selector), X_BLOCK * xLocation, Y_BLOCK * 4 + 43);
     i = 0;
     this.spriteArray.forEach(function(sprite){
-        ctx.drawImage(Resources.get(sprite), xBlock * i, yBlock * 4 + 43);
+        ctx.drawImage(Resources.get(sprite), X_BLOCK * i, Y_BLOCK * 4 + 43);
         i++;
     });
 };   
@@ -184,12 +183,13 @@ Player.prototype.charSelect = function(i){
 
 //checks for collisions between player and enemies/items
 Player.prototype.checkCollisions = function() {
+	var self = this;
 	//if player collides with enemy, lose one life and restart from origin point
     allEnemies.forEach(function(enemy){
-        if (player.x - enemy.x >= -47 && player.x - enemy.x <= 63 && player.y - enemy.y >= -64 && player.y - enemy.y <= 51){
+        if (self.x - enemy.x >= -47 && self.x - enemy.x <= 63 && self.y - enemy.y >= -64 && self.y - enemy.y <= 51){
         	hit.play();
-            player.reset();
-            player.updateLives(-1);
+            self.reset();
+            self.updateLives(-1);
         }
     })
     //if player collides with an item, gain one point
@@ -228,8 +228,8 @@ Item.prototype.update = function(){
         else {
         	this.sprite = Resources.get(this.spriteArray[0]);
         }
-        this.x = (Math.floor(Math.random()*5)) * xBlock;
-        this.y = (Math.floor(Math.random()*3)+1) * yBlock - 20;
+        this.x = (Math.floor(Math.random()*5)) * X_BLOCK;
+        this.y = (Math.floor(Math.random()*3)+1) * Y_BLOCK - 20;
     }
 }
 

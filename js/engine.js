@@ -117,6 +117,12 @@ var Engine = (function(global) {
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
+            if (enemy.isGone === true) {
+                allEnemies.push(new Enemy(Math.floor(Math.random()*3)+1));
+                var index = allEnemies.indexOf(enemy);
+                allEnemies.splice(index, 1);
+                //allEnemies.push(new Enemy(1));
+            }
         });
         player.update();
         player.updateScore();
