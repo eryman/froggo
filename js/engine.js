@@ -87,9 +87,10 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         //added the following three lines to play a sound effect and background music when the game begins
-        hit.play();
-        backgroundMusic.src = 'audio/octoberwalrus-cosmicdanceparty.mp3'
-        backgroundMusic.play();
+        sound.hit.play();
+        sound.backgroundMusic.src = 'audio/octoberwalrus-cosmicdanceparty.mp3'
+        sound.backgroundMusic.volume = 0.3;
+        sound.backgroundMusic.play();
         main();
     }
 
@@ -121,7 +122,6 @@ var Engine = (function(global) {
                 allEnemies.push(new Enemy(Math.floor(Math.random()*3)+1));
                 var index = allEnemies.indexOf(enemy);
                 allEnemies.splice(index, 1);
-                //allEnemies.push(new Enemy(1));
             }
         });
         player.update();
@@ -261,7 +261,7 @@ var Engine = (function(global) {
     }
     
 	function startGameInput(keys) {
-        if (player.lives > 9999){    
+        if (player.isSelected === false){    
             switch(keys){
       	        case 'enter':
                     player.charSelect(i);
@@ -269,7 +269,7 @@ var Engine = (function(global) {
     	            break;
                 case 'left':
                     if (i > 0) {
-                        menuNavigate.play();
+                        sound.menuNavigate.play();
                         i--;                    
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         renderBackground();
@@ -279,7 +279,7 @@ var Engine = (function(global) {
     	            break;
     	        case 'right':
                     if (i < 4) {
-                        menuNavigate.play();
+                        sound.menuNavigate.play();
                         i++;
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         renderBackground();
@@ -294,8 +294,8 @@ var Engine = (function(global) {
     //creates a game over screen once player.lives reaches 0
     function gameOver(){
         if (player.lives === 0){
-            backgroundMusic.src = "";
-            heroDeath.play();
+            sound.backgroundMusic.src = "";
+            sound.heroDeath.play();
             ctx.save()
             ctx.font = "70pt impact";
             ctx.textAlign = "center";
@@ -314,9 +314,9 @@ var Engine = (function(global) {
         if (player.lives === 0) {
     	    switch(keys){
     	        case 'space':
-                    hit.play();
+                    sound.hit.play();
                     reset();
-                    player.lives = 10000;
+                    player.isSelected = false;
                     i = 0;
                     loadCharSelect();
     	            break;
@@ -356,9 +356,3 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
 })(this);
-
-
-
-
-
-

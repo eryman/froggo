@@ -3,6 +3,18 @@ var X_BLOCK = 101;
 var Y_BLOCK = 83;
 
 
+//------Create GamePiece "class" to be used by Player, Enemy, and Item for certain functions
+
+var GamePiece = function(){
+    //renders all sprites onto game board
+    this.render = function() {
+        if (this.sprite != null){
+            console.log(this.sprite);
+            ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+        };
+    };
+}
+
 
 //------Create Enemy "class"------
 
@@ -18,6 +30,7 @@ var Enemy = function(start) {
     this.isGone = false;
 };
 
+Enemy.prototype = new GamePiece();
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -27,8 +40,7 @@ Enemy.prototype.update = function(dt) {
     // all computers.
     this.x += this.speed*dt;
     if (this.x > 503/* && this.x < 506*/) {
-    	this.isGone = true;
-    	console.log(this.isGone);
+        this.isGone = true;
     };
 };
 
@@ -38,30 +50,26 @@ Enemy.prototype.reset = function(start){
         this.x = 0;
 }
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-
-
 
 
 //------Create Player "class"------
 
 var Player = function() {
-    this.spriteArray = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png']
+    this.spriteArray = [];
     this.selector = 'images/Selector.png';
     this.x = X_BLOCK * 2;
     this.y = Y_BLOCK * 4 + 43;
     this.score = 0;
-    this.lives = 10000;
+    this.lives = 3;
+    this.isSelected = false;
 }
+
+Player.prototype = new GamePiece();
 
 //resets the player's location and raises score by 1 if water is reached
 Player.prototype.update = function() {
     if (this.y < 20){
-    	achievement.play();
+        sound.achievement.play();
         this.reset();
         this.scoreKeeper(1);
     }
@@ -72,11 +80,6 @@ Player.prototype.reset = function() {
     this.x = X_BLOCK * 2;
     this.y = Y_BLOCK * 4 + 43;
     return this.x, this.y;
-}
-
-//Draws player onto game board
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 //Handles input for player (moving up, down, left, right)
@@ -162,7 +165,7 @@ Player.prototype.renderLives = function(){
 
 //reset lives - 4 rather than three so that the start screen functions don't work when the game is being played 
 Player.prototype.resetLives = function(){
-    this.lives = 4;
+    this.lives = 3;
 }
 
 
@@ -178,16 +181,17 @@ Player.prototype.renderCharSelect = function(xLocation){
 
 //takes the sprite chosen during the character select screen and uses it for game play
 Player.prototype.charSelect = function(i){
-	this.sprite = this.spriteArray[i];
+    this.sprite = this.spriteArray[i];
+    this.isSelected = true;
 }
 
 //checks for collisions between player and enemies/items
 Player.prototype.checkCollisions = function() {
-	var self = this;
-	//if player collides with enemy, lose one life and restart from origin point
+    var self = this;
+    //if player collides with enemy, lose one life and restart from origin point
     allEnemies.forEach(function(enemy){
         if (self.x - enemy.x >= -47 && self.x - enemy.x <= 63 && self.y - enemy.y >= -64 && self.y - enemy.y <= 51){
-        	hit.play();
+            sound.hit.play();
             self.reset();
             self.updateLives(-1);
         }
@@ -195,13 +199,13 @@ Player.prototype.checkCollisions = function() {
     //if player collides with an item, gain one point
     if (this.x - item.x <= 67 && this.x - item.x >= -66 && this.y - item.y <= 48 && this.y - item.y >= -87){
         player.scoreKeeper(1);
-        pickup.play();
+        sound.pickup.play();
         item.reset();
     }
     //if player collides with an extraLife, gain one life
     if (this.x - extraLife.x <= 50 && this.x - extraLife.x >= -51 && this.y - extraLife.y <= 59 && this.y - extraLife.y >= -61){
         player.updateLives(1);
-        pickup.play();
+        sound.pickup.play();
         extraLife.reset();
     }
 }
@@ -219,31 +223,28 @@ var Item = function(f){
     this.frequency = f;
 }
 
+Item.prototype = new GamePiece();
+
 //updates location of item (item shows up whenever score is a multiple of 6)
 Item.prototype.update = function(){
-    if (player.score > 1 && player.score % this.frequency == 0){
+    this.sprite = null;
+    if (player.score > 0 && player.score % this.frequency == 0){
         if (this.spriteArray.length > 1){
-        	this.sprite = Resources.get(this.spriteArray[Math.floor(Math.random()*3)])
+            this.sprite = this.spriteArray[Math.floor(Math.random()*3)]
+            //console.log(this.sprite);
         }
         else {
-        	this.sprite = Resources.get(this.spriteArray[0]);
+            this.sprite = this.spriteArray[0];
         }
         this.x = (Math.floor(Math.random()*5)) * X_BLOCK;
         this.y = (Math.floor(Math.random()*3)+1) * Y_BLOCK - 20;
     }
 }
 
-//displays item - one item will appear for every six points scored
-Item.prototype.render = function(){
-    if (player.score > 1 && player.score % this.frequency == 0){
-    	//console.log(this.sprite);
-        ctx.drawImage(this.sprite, this.x, this.y);
-    }
-}
 
 Item.prototype.reset = function(){
-	this.x = -100;
-	this.y = -100;
+    this.x = -100;
+    this.y = -100;
 }
 
 
@@ -251,15 +252,18 @@ Item.prototype.reset = function(){
 //------Instantiate music and sound objects------
 
 //All sound effects are from the LittleRobotSoundFactory library found on freesound.org
-var pickup = new Audio('audio/pickup.wav');
-var achievement = new Audio('audio/achievement.wav');
-var hit = new Audio('audio/hit.wav');
-var menuNavigate = new Audio('audio/menu-navigate.wav');
-var heroDeath = new Audio('audio/hero-death.wav');
 //Background Music is "Cosmic Dance Party," from the album Windmill Spiritual by octoberwalrus - http://octoberwalrus.bandcamp.com
-var backgroundMusic = new Audio('audio/octoberwalrus-cosmicdanceparty.mp3');
-backgroundMusic.volume = 0.3;
 
+var sound = {
+    pickup : new Audio('audio/pickup.wav'),
+    achievement : new Audio('audio/achievement.wav'),
+    hit : new Audio('audio/hit.wav'),
+    menuNavigate : new Audio('audio/menu-navigate.wav'),
+    heroDeath : new Audio('audio/hero-death.wav'),
+    //Background Music is "Cosmic Dance Party," from the album Windmill Spiritual by octoberwalrus - http://octoberwalrus.bandcamp.com
+    backgroundMusic : new Audio('audio/octoberwalrus-cosmicdanceparty.mp3')
+    //backgroundMusic.volume  0.3
+};
 
 
 //------Instantiate player, enemy, and item objects------
@@ -267,6 +271,11 @@ backgroundMusic.volume = 0.3;
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var player = new Player();
+player.spriteArray = ['images/char-boy.png', 'images/char-cat-girl.png', 'images/char-horn-girl.png', 'images/char-pink-girl.png', 'images/char-princess-girl.png'];
+
+//FIND CODE THAT CHOOSES SPECIFIC PLAYER SPRITE - MAKE SURE THAT SPRITE IS SET TO this.sprite
+
+
 var allEnemies = [new Enemy(1), new Enemy(2), new Enemy(3)];
 //instantiates item object
 var item = new Item(6);
@@ -287,18 +296,3 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
